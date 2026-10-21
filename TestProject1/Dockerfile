@@ -1,23 +1,36 @@
-﻿FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS base
-USER $APP_UID
-WORKDIR /app
-EXPOSE 8080
-EXPOSE 8081
-
+﻿
+# Build and publish the application
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
-ARG BUILD_CONFIGURATION=Release
+
 WORKDIR /src
+
+# Copy project file and restore dependencies
 COPY ["TestProject1/TestProject1.csproj", "TestProject1/"]
 RUN dotnet restore "TestProject1/TestProject1.csproj"
-COPY . .
-WORKDIR "/src/TestProject1"
-RUN dotnet build "./TestProject1.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
-FROM build AS publish
-ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./TestProject1.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+# Copy application source code
+COPY TestProject1/ TestProject1/
 
-FROM base AS final
+# Publish the application
+RUN dotnet publish "TestProject1/TestProject1.csproj" \
+    -c Release \
+    -o /app/publish \
+    --no-restore \
+    /p:UseAppHost=false
+
+# Final runtime image
+FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS final
+
 WORKDIR /app
-COPY --from=publish /app/publish .
+
+# Configure HTTP
+ENV ASPNETCORE_HTTP_PORTS=8080
+EXPOSE 8080
+
+# Copy published files
+COPY --from=build /app/publish .
+
+# Run as non-root
+USER $APP_UID
+
 ENTRYPOINT ["dotnet", "TestProject1.dll"]
