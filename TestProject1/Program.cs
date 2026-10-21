@@ -8,6 +8,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddApiDocumentation();
 builder.Services.AddControllers();
 builder.Services.AddApplicationServices();
+builder.Services.AddGlobalExceptionHandling();
 // Authentication and authorization
 builder.Services.AddJwtAuthentication(builder.Configuration);
 
@@ -15,6 +16,8 @@ var app = builder.Build();
 
 // Initialize database
 await app.ApplyDatabaseMigrationsAsync();
+
+app.UseExceptionHandler();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
