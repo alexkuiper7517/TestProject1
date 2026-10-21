@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TestProject1.Models.DTOs;
 using TestProject1.Service;
@@ -5,6 +6,7 @@ using TestProject1.Service;
 namespace TestProject1.Controllers;
 
 [ApiController]
+[Authorize]
 [Route("api/[controller]")]
 public class TaskStatisticsController : ControllerBase
 {

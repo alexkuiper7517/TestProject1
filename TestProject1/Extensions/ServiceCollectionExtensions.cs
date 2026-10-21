@@ -21,6 +21,7 @@ public static class ServiceCollectionExtensions
         // Services
         services.AddScoped<ITaskService, TaskService>();
         services.AddScoped<ITaskStatisticsService, TaskStatisticsService>();
+        services.AddScoped<IAuthService, AuthService>();
         
         // Keep the in-memory database alive
         services.AddSingleton<SqliteConnection>(_ =>
